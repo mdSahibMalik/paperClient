@@ -82,32 +82,36 @@ function RegisteredColleges() {
     }
   };
   // ✅ Fetch all data from backend
-  const fetchData = () => {
+  const fetchData = async () => {
+  try {
     setLoading(true);
     setError(null);
 
-    fetch(
-     `${import.meta.env.VITE_LOCAL_URI_ADMIN}/registered-colleges`,
+    const res = await fetch(
+      `${import.meta.env.VITE_LOCAL_URI_ADMIN}/registered-colleges`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((data) => {
-        setRequests(data.requests);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setError("Failed to load data");
-        setLoading(false);
-      });
-  };
+    );
+
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await res.json();
+    setRequests(data.requests);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError("Failed to load data");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchData();
